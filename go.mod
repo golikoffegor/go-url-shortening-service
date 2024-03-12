@@ -2,7 +2,10 @@ module github.com/golikoffegor/go-server-metcrics-and-alerts
 
 go 1.21.0
 
-require github.com/stretchr/testify v1.9.0
+require (
+	github.com/go-chi/chi v1.5.5
+	github.com/stretchr/testify v1.9.0
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
