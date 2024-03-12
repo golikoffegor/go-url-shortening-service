@@ -22,7 +22,7 @@ func run() error {
 
 // Инициализация и запуск сервера
 func InitAndRunServer() {
-	storage.Storage = storage.NewMemStorage()
+	handler.Storage = storage.NewMemStorage()
 	if err := run(); err != nil {
 		panic(err)
 	}

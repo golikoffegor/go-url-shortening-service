@@ -57,7 +57,7 @@ func TestRegistryHandlerURL(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// Создаем фейковое хранилище
-			storage.Storage = storage.NewMemStorage()
+			Storage = storage.NewMemStorage()
 			// Создаем HTTP запрос для записи URL
 			req := httptest.NewRequest(test.request.method, "/", strings.NewReader(test.request.body))
 			// Задаем заголовки
@@ -126,9 +126,9 @@ func TestGetURLbyIDHandler(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// Создаем фейковое хранилище
-			storage.Storage = storage.NewMemStorage()
+			Storage = storage.NewMemStorage()
 			key := genShortURL()
-			storage.Storage.UpdateURLAddress(key, test.want.location)
+			Storage.UpdateURLAddress(key, test.want.location)
 			// Создаем HTTP запрос для записи URL
 			req := httptest.NewRequest(test.request.method, "/"+key, strings.NewReader(""))
 			// Задаем заголовки

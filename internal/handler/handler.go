@@ -10,6 +10,8 @@ import (
 	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/storage"
 )
 
+var Storage *storage.MemStorage
+
 // Функция — обработчик HTTP-запроса RegistryHandlerURL
 func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -21,7 +23,7 @@ func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 		key := genShortURL()
 		stringURL := string(body)
 		// Сохраняем данные в хранилище
-		storage.Storage.UpdateURLAddress(key, stringURL)
+		Storage.UpdateURLAddress(key, stringURL)
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(201)
@@ -37,8 +39,9 @@ func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 // Функция — обработчик HTTP-запроса GetURLbyIDHandler
 func GetURLbyIDHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.String()[1:]
-	getURL := storage.Storage.GetURLAddress(key)
-	if getURL != "" {
+	getURL, ok := Storage.GetURLAddress(key)
+	okURL := validateURL(getURL)
+	if ok && okURL {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.Header().Set("Location", getURL)

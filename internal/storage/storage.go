@@ -1,14 +1,9 @@
 package storage
 
-var Storage *MemStorage
-
-// urlType определяет тип URL
-type urlType string
-
-// MetricsStorage определяет интерфейс для взаимодействия с хранилищем метрик
-type MetricsStorage interface {
-	GetURLAddress(key string) string
-	UpdateURLAddress(key string, url string) map[urlType]map[string]interface{}
+// MemStorageInterface интерфейс
+type MemStorageInterface interface {
+	GetURLAddress(key string)
+	UpdateURLAddress(key string, url string)
 }
 
 // MemStorage хранилище
@@ -24,8 +19,9 @@ func NewMemStorage() *MemStorage {
 }
 
 // GetURLAddress возвращает URL из хранилища по ключу key
-func (m *MemStorage) GetURLAddress(key string) string {
-	return m.urlAddresses[key]
+func (m *MemStorage) GetURLAddress(key string) (string, bool) {
+	v, ok := m.urlAddresses[key]
+	return v, ok
 }
 
 // UpdateURLAddress записывает URL в хранилище с ключом key
