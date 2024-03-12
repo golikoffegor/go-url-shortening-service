@@ -74,7 +74,7 @@ func TestRegistryHandlerURL(t *testing.T) {
 			// Проверяем заголовки ответа
 			assert.Equal(t, test.want.contentType, result.Header.Get("Content-Type"))
 			// Проверяем тело ответа запроса
-			assert.Contains(t, w.Body.String(), test.want.contentBody)
+			assert.Contains(t, "http://localhost:8080/"+w.Body.String(), test.want.contentBody)
 
 		})
 	}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/golikoffegor/go-server-metcrics-and-alerts/config"
 	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/storage"
 )
 
@@ -24,7 +25,7 @@ func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(201)
-		w.Write([]byte("http://localhost:8080/" + key))
+		w.Write([]byte(config.BaseURL + "/" + key))
 	} else {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
