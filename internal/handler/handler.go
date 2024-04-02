@@ -27,12 +27,19 @@ func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(201)
-		w.Write([]byte(config.BaseURL + "/" + key))
+		_, err := w.Write([]byte(config.BaseURL + "/" + key))
+		if err != nil {
+			return
+		}
+
 	} else {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(400)
-		w.Write([]byte("No URL in request"))
+		_, err := w.Write([]byte("No URL in request"))
+		if err != nil {
+			return
+		}
 	}
 }
 
