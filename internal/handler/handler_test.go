@@ -8,8 +8,78 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/golikoffegor/go-server-metcrics-and-alerts/config"
 	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/storage"
 )
+
+func TestJSONHandlerURL(t *testing.T) {
+	type request struct {
+		method      string
+		body        string
+		contentType string
+	}
+	type want struct {
+		code        int
+		contentType string
+		contentBody string
+	}
+	tests := []struct {
+		name    string
+		request request
+		want    want
+	}{
+		{
+			name: "Test StatusCreated",
+			request: request{
+				method:      http.MethodPost,
+				body:        `{"URL":"http://practicum.yandex.ru/"}`,
+				contentType: "application/json",
+			},
+			want: want{
+				code:        http.StatusCreated,
+				contentType: "application/json",
+				contentBody: `{"result":"`,
+			},
+		},
+		{
+			name: "Test StatusBadRequest",
+			request: request{
+				method:      http.MethodPost,
+				body:        "",
+				contentType: "application/json",
+			},
+			want: want{
+				code:        http.StatusBadRequest,
+				contentType: "text/plain",
+				contentBody: "No URL in request",
+			},
+		},
+	}
+	config.BaseURL = "http://localhost:8080"
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Создаем фейковое хранилище
+			Storage = storage.NewMemStorage()
+			// Создаем HTTP запрос для записи URL
+			req := httptest.NewRequest(test.request.method, "/api/shorten", strings.NewReader(test.request.body))
+			// Задаем заголовки
+			req.Header.Set("Content-Type", test.request.contentType)
+			// Создаем ResponseRecorder для записи ответа сервера
+			w := httptest.NewRecorder()
+			// Создаем обработчик и вызываем его метод ServeHTTP
+			JSONHandlerURL(w, req)
+			// Результат записываем в переменную
+			result := w.Result()
+			defer result.Body.Close()
+			// Проверяем код ответа
+			assert.Equal(t, test.want.code, result.StatusCode)
+			// Проверяем заголовки ответа
+			assert.Equal(t, test.want.contentType, result.Header.Get("Content-Type"))
+			// Проверяем тело ответа запроса
+			assert.Contains(t, w.Body.String(), test.want.contentBody)
+		})
+	}
+}
 
 func TestRegistryHandlerURL(t *testing.T) {
 	type request struct {

@@ -15,6 +15,7 @@ import (
 // Инициализации зависимостей сервера перед запуском
 func run() error {
 	r := chi.NewRouter()
+	r.Post("/api/shorten", logger.MiddlewareLog(handler.JSONHandlerURL))
 	r.Post("/", logger.MiddlewareLog(handler.RegistryHandlerURL))
 	r.Get("/{id}", logger.MiddlewareLog(handler.GetURLbyIDHandler))
 	fmt.Println("Running server on", config.ServerAdress)

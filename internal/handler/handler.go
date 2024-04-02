@@ -1,16 +1,49 @@
 package handler
 
 import (
+	"encoding/json"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/url"
 
 	"github.com/golikoffegor/go-server-metcrics-and-alerts/config"
+	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/model"
 	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/storage"
 )
 
 var Storage *storage.MemStorage
+
+// Функция — обработчик HTTP-запроса JsonHandlerURL
+func JSONHandlerURL(w http.ResponseWriter, r *http.Request) {
+	var inputJSON model.InputJSON
+	body, err := io.ReadAll(r.Body)
+	_ = json.Unmarshal(body, &inputJSON)
+	if validateURL(inputJSON.URL) && err == nil {
+		// Генерируем ключ
+		key := genShortURL()
+		// Сохраняем данные в хранилище
+		Storage.UpdateURLAddress(key, inputJSON.URL)
+		// Установка заголовков
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(201)
+		resultModel := model.ResultShortenURL{URL: config.BaseURL + "/" + key}
+		resultJSON, _ := json.Marshal(resultModel)
+		_, err := w.Write(resultJSON)
+		if err != nil {
+			return
+		}
+
+	} else {
+		// Установка заголовков
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(400)
+		_, err := w.Write([]byte("No URL in request"))
+		if err != nil {
+			return
+		}
+	}
+}
 
 // Функция — обработчик HTTP-запроса RegistryHandlerURL
 func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
