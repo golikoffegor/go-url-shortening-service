@@ -1,4 +1,4 @@
-package logger
+package middleware
 
 import (
 	"net/http"
@@ -35,7 +35,7 @@ func (r *loggingResponseWriter) WriteHeader(statusCode int) {
 	}
 }
 
-func MiddlewareLog(handler http.HandlerFunc) http.HandlerFunc {
+func Log(handler http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger, _ := zap.NewDevelopment()
 		start := time.Now()
