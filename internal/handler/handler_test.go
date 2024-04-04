@@ -8,8 +8,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/config"
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/storage"
+	"github.com/golikoffegor/go-url-shortening-service/config"
+	"github.com/golikoffegor/go-url-shortening-service/internal/model"
+	"github.com/golikoffegor/go-url-shortening-service/internal/storage/memstorage"
 )
 
 func TestJSONHandlerURL(t *testing.T) {
@@ -59,7 +60,7 @@ func TestJSONHandlerURL(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// Создаем фейковое хранилище
-			Storage = storage.NewMemStorage()
+			Storage = memstorage.NewStorage()
 			// Создаем HTTP запрос для записи URL
 			req := httptest.NewRequest(test.request.method, "/api/shorten", strings.NewReader(test.request.body))
 			// Задаем заголовки
@@ -127,7 +128,7 @@ func TestRegistryHandlerURL(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// Создаем фейковое хранилище
-			Storage = storage.NewMemStorage()
+			Storage = memstorage.NewStorage()
 			// Создаем HTTP запрос для записи URL
 			req := httptest.NewRequest(test.request.method, "/", strings.NewReader(test.request.body))
 			// Задаем заголовки
@@ -196,11 +197,11 @@ func TestGetURLbyIDHandler(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// Создаем фейковое хранилище
-			Storage = storage.NewMemStorage()
-			key := genShortURL()
-			Storage.UpdateURLAddress(key, test.want.location)
+			Storage = memstorage.NewStorage()
+			shortening := model.Shortening{Key: genShortURL(), URL: test.want.location}
+			_ = Storage.Put(shortening)
 			// Создаем HTTP запрос для записи URL
-			req := httptest.NewRequest(test.request.method, "/"+key, strings.NewReader(""))
+			req := httptest.NewRequest(test.request.method, "/"+shortening.Key, strings.NewReader(""))
 			// Задаем заголовки
 			req.Header.Set("Content-Type", test.request.contentType)
 			// Создаем ResponseRecorder для записи ответа сервера

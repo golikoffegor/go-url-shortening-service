@@ -6,10 +6,10 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/config"
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/handler"
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/middleware"
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/storage"
+	"github.com/golikoffegor/go-url-shortening-service/config"
+	"github.com/golikoffegor/go-url-shortening-service/internal/handler"
+	"github.com/golikoffegor/go-url-shortening-service/internal/middleware"
+	"github.com/golikoffegor/go-url-shortening-service/internal/storage"
 )
 
 // Инициализации зависимостей сервера перед запуском
@@ -24,9 +24,8 @@ func run() error {
 
 // Инициализация и запуск сервера
 func InitAndRunServer() {
-	handler.Storage = storage.NewMemStorage()
+	handler.Storage = storage.GetStorage()
 	if err := run(); err != nil {
 		panic(err)
 	}
-
 }

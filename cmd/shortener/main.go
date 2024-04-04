@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/config"
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/server"
+	"github.com/golikoffegor/go-url-shortening-service/config"
+	"github.com/golikoffegor/go-url-shortening-service/internal/server"
 )
 
 // Функция main вызывается автоматически при запуске приложения

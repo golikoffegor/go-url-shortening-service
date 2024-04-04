@@ -1,4 +1,4 @@
-module github.com/golikoffegor/go-server-metcrics-and-alerts
+module github.com/golikoffegor/go-url-shortening-service
 
 go 1.21.0
 
