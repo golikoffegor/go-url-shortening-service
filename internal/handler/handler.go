@@ -1,16 +1,53 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/url"
 
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/config"
-	"github.com/golikoffegor/go-server-metcrics-and-alerts/internal/storage"
+	"github.com/golikoffegor/go-url-shortening-service/config"
+	"github.com/golikoffegor/go-url-shortening-service/internal/interfaces"
+	"github.com/golikoffegor/go-url-shortening-service/internal/model"
 )
 
-var Storage *storage.MemStorage
+var Storage interfaces.Storager
+
+// Функция — обработчик HTTP-запроса JsonHandlerURL
+func JSONHandlerURL(w http.ResponseWriter, r *http.Request) {
+	var inputJSON model.InputJSON
+	body, err := io.ReadAll(r.Body)
+	_ = json.Unmarshal(body, &inputJSON)
+	if validateURL(inputJSON.URL) && err == nil {
+		// Генерируем ключ
+		shortening := model.Shortening{Key: genShortURL(), URL: inputJSON.URL}
+		// Сохраняем данные в хранилище
+		err := Storage.Put(shortening)
+		if err != nil {
+			return
+		}
+		// Установка заголовков
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(201)
+		resultModel := model.ResultShortenURL{URL: config.BaseURL + "/" + shortening.Key}
+		resultJSON, _ := json.Marshal(resultModel)
+		_, err = w.Write(resultJSON)
+		if err != nil {
+			return
+		}
+
+	} else {
+		// Установка заголовков
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(400)
+		_, err := w.Write([]byte("No URL in request"))
+		if err != nil {
+			return
+		}
+	}
+}
 
 // Функция — обработчик HTTP-запроса RegistryHandlerURL
 func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
@@ -20,31 +57,41 @@ func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(body) > 0 && validateURL(string(body)) {
 		// Генерируем ключ
-		key := genShortURL()
-		stringURL := string(body)
+		shortening := model.Shortening{Key: genShortURL(), URL: string(body)}
 		// Сохраняем данные в хранилище
-		Storage.UpdateURLAddress(key, stringURL)
+		err := Storage.Put(shortening)
+		if err != nil {
+			return
+		}
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(201)
-		w.Write([]byte(config.BaseURL + "/" + key))
+		_, err = w.Write([]byte(config.BaseURL + "/" + shortening.Key))
+		if err != nil {
+			return
+		}
+
 	} else {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(400)
-		w.Write([]byte("No URL in request"))
+		_, err := w.Write([]byte("No URL in request"))
+		if err != nil {
+			return
+		}
 	}
 }
 
 // Функция — обработчик HTTP-запроса GetURLbyIDHandler
 func GetURLbyIDHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.String()[1:]
-	getURL, ok := Storage.GetURLAddress(key)
-	okURL := validateURL(getURL)
-	if ok && okURL {
+	shortening, err := Storage.Get(key)
+	fmt.Println(shortening)
+	okURL := validateURL(shortening.URL)
+	if err == nil && okURL {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
-		w.Header().Set("Location", getURL)
+		w.Header().Set("Location", shortening.URL)
 		w.WriteHeader(307)
 	} else {
 		// Установка заголовков
@@ -61,6 +108,7 @@ func genShortURL() string {
 	for i := range key {
 		key[i] = letters[rand.Intn(len(letters))]
 	}
+
 	return string(key)
 }
 
