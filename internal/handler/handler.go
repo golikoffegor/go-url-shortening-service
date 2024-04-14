@@ -1,12 +1,14 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/url"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/golikoffegor/go-url-shortening-service/config"
 	"github.com/golikoffegor/go-url-shortening-service/internal/interfaces"
@@ -86,7 +88,6 @@ func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 func GetURLbyIDHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.String()[1:]
 	shortening, err := Storage.Get(key)
-	fmt.Println(shortening)
 	okURL := validateURL(shortening.URL)
 	if err == nil && okURL {
 		// Установка заголовков
@@ -99,6 +100,22 @@ func GetURLbyIDHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Location", "URL not found")
 		w.WriteHeader(400)
 	}
+}
+
+// Функция — обработчик HTTP-запроса GetPingDB
+func GetPingDB(w http.ResponseWriter, r *http.Request) {
+	db, _ := sql.Open("pgx", config.PostgreSQLDSN)
+	err := db.Ping()
+	if err == nil {
+		// Установка заголовков
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(200)
+	} else {
+		// Установка заголовков
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(500)
+	}
+	defer db.Close()
 }
 
 // Генерирование короткого URL

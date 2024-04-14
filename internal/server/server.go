@@ -18,6 +18,7 @@ func run() error {
 	r.Post("/api/shorten", middleware.GZIP(middleware.Log(handler.JSONHandlerURL)))
 	r.Post("/", middleware.GZIP(middleware.Log(handler.RegistryHandlerURL)))
 	r.Get("/{id}", middleware.GZIP(middleware.Log(handler.GetURLbyIDHandler)))
+	r.Get("/ping", middleware.GZIP(middleware.Log(handler.GetPingDB)))
 	fmt.Println("Running server on", config.ServerAdress)
 	return http.ListenAndServe(config.ServerAdress, r)
 }
