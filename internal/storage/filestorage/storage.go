@@ -79,3 +79,8 @@ func refreshMap(m *sync.Map, filePath string) error {
 
 	return nil
 }
+
+// Initialize хранилища
+func (fs *FileStorage) Initialize() error {
+	return nil
+}

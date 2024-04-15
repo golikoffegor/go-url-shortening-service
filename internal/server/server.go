@@ -26,6 +26,10 @@ func run() error {
 // Инициализация и запуск сервера
 func InitAndRunServer() {
 	handler.Storage = storage.GetStorage()
+	err := handler.Storage.Initialize()
+	if err != nil {
+		panic(err)
+	}
 	if err := run(); err != nil {
 		panic(err)
 	}
