@@ -80,6 +80,16 @@ func refreshMap(m *sync.Map, filePath string) error {
 	return nil
 }
 
+func (fs *FileStorage) PutBatch(shorteningList []model.Shortening) error {
+	for _, item := range shorteningList {
+		err := fs.Put(item)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Initialize хранилища
 func (fs *FileStorage) Initialize() error {
 	return nil

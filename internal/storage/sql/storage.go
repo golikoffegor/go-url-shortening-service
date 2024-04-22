@@ -39,6 +39,19 @@ func (ps *PostgreSQLStorage) Put(shortening model.Shortening) error {
 	return err
 }
 
+func (ps *PostgreSQLStorage) PutBatch(shorteningList []model.Shortening) error {
+	var values string
+	for index, item := range shorteningList {
+		values += fmt.Sprintf("('%v', '%v')", item.URL, item.Key)
+		if index < len(shorteningList)-1 {
+			values += ", "
+		}
+	}
+	query := fmt.Sprintf("INSERT INTO shortenerurls (url, url_key) VALUES %s;", values)
+	_, err := ps.db.RwDB.DB.Exec(query)
+	return err
+}
+
 func MigrateUp(driverName string, db *sqlx.DB) (int, error) {
 	migrations := migrate.AssetMigrationSource{
 		Asset:    postgresql.Asset,

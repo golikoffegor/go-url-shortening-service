@@ -52,6 +52,45 @@ func JSONHandlerURL(w http.ResponseWriter, r *http.Request) {
 }
 
 // Функция — обработчик HTTP-запроса RegistryHandlerURL
+func BatchRegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
+	var inputJSON []model.InputURLData
+	body, err := io.ReadAll(r.Body)
+	_ = json.Unmarshal(body, &inputJSON)
+	if validateURLs(inputJSON) && err == nil {
+		var urlBatch []model.Shortening
+		var outputURLBatch []model.OutputURLData
+		for _, item := range inputJSON {
+			// Генерируем ключ
+			key := genShortURL()
+			urlBatch = append(urlBatch, model.Shortening{Key: key, URL: item.OriginalURL})
+			outputURLBatch = append(outputURLBatch, model.OutputURLData{CorrelationID: item.CorrelationID, ShortURL: config.BaseURL + "/" + key})
+		}
+		// Сохраняем данные в хранилище
+		err := Storage.PutBatch(urlBatch)
+		if err != nil {
+			return
+		}
+		// Установка заголовков
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(201)
+		resultJSON, _ := json.Marshal(outputURLBatch)
+		_, err = w.Write(resultJSON)
+		if err != nil {
+			return
+		}
+
+	} else {
+		// Установка заголовков
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(400)
+		_, err := w.Write([]byte("No URL in request"))
+		if err != nil {
+			return
+		}
+	}
+}
+
+// Функция — обработчик HTTP-запроса RegistryHandlerURL
 func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -133,4 +172,14 @@ func genShortURL() string {
 func validateURL(str string) bool {
 	urlData, err := url.Parse(str)
 	return err == nil && urlData.Host != "" && urlData.Scheme != ""
+}
+
+// Проверяем валидность URL
+func validateURLs(InputURLData []model.InputURLData) bool {
+	for _, item := range InputURLData {
+		if !validateURL(item.OriginalURL) {
+			return false
+		}
+	}
+	return true
 }

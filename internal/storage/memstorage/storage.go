@@ -35,6 +35,13 @@ func (m MemStorage) Put(shortening model.Shortening) error {
 	return nil
 }
 
+func (m MemStorage) PutBatch(shorteningList []model.Shortening) error {
+	for _, item := range shorteningList {
+		m.urlAddresses[item.Key] = item.URL
+	}
+	return nil
+}
+
 // Initialize хранилища
 func (m MemStorage) Initialize() error {
 	return nil
