@@ -8,11 +8,10 @@ import (
 	"strings"
 )
 
-//lint:ignore SA1003 should not use underscores in Go names
-func bindata_read(data []byte, name string) ([]byte, error) {
+func bindataRead(data []byte, name string) ([]byte, error) { //nolint:all
 	gz, err := gzip.NewReader(bytes.NewBuffer(data))
 	if err != nil {
-		return nil, fmt.Errorf("Read %q: %v", name, err)
+		return nil, fmt.Errorf("read %q: %v", name, err)
 	}
 
 	var buf bytes.Buffer
@@ -20,27 +19,36 @@ func bindata_read(data []byte, name string) ([]byte, error) {
 	gz.Close()
 
 	if err != nil {
-		return nil, fmt.Errorf("Read %q: %v", name, err)
+		return nil, fmt.Errorf("read %q: %v", name, err)
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _bindata_go = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x01\x00\x00\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00")
+var _bindataGo = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x01\x00\x00\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00")
 
-func bindata_go() ([]byte, error) {
-	return bindata_read(
-		_bindata_go,
+func bindataGo() ([]byte, error) {
+	return bindataRead(
+		_bindataGo,
 		"bindata.go",
 	)
 }
 
-var _internal_storage_sql_postgresql_migrations_default_1_init_sql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd5\x55\xd0\xce\xcd\x4c\x2f\x4a\x2c\x49\x55\x08\x2d\xe0\x42\xe6\x06\x97\x24\x96\xa4\xe6\xa6\xe6\x95\x38\xa5\xa6\x67\xe6\x71\x39\x07\xb9\x3a\x86\xb8\x2a\x84\x38\x3a\xf9\xb8\x2a\x14\x67\xe4\x17\x95\xa4\xe6\xa5\x16\x95\x16\xe5\x14\x2b\x68\x70\x29\x28\x28\x28\x64\xa6\x28\x04\xbb\x06\x79\x3a\xfa\x28\x04\x04\x79\xfa\x3a\x06\x45\x2a\x78\xbb\x46\xea\x80\xa5\x4a\x8b\x72\x14\x4a\x52\x2b\x4a\x14\xfc\xfc\x43\x14\xfc\x42\x7d\x7c\xe0\xc2\xf1\xd9\xa9\x95\xa8\x52\x5c\x9a\xd6\xd8\x9d\xe1\x9a\x97\x02\x08\x00\x00\xff\xff\xb7\x22\xe8\x03\xae\x00\x00\x00")
+var _internalStorageSQLPostgresqlMigrationsDefault1InitSQL = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd5\x55\xd0\xce\xcd\x4c\x2f\x4a\x2c\x49\x55\x08\x2d\xe0\x42\xe6\x06\x97\x24\x96\xa4\xe6\xa6\xe6\x95\x38\xa5\xa6\x67\xe6\x71\x39\x07\xb9\x3a\x86\xb8\x2a\x84\x38\x3a\xf9\xb8\x2a\x14\x67\xe4\x17\x95\xa4\xe6\xa5\x16\x95\x16\xe5\x14\x2b\x68\x70\x29\x28\x28\x28\x64\xa6\x28\x04\xbb\x06\x79\x3a\xfa\x28\x04\x04\x79\xfa\x3a\x06\x45\x2a\x78\xbb\x46\xea\x80\xa5\x4a\x8b\x72\x14\x4a\x52\x2b\x4a\x14\xfc\xfc\x43\x14\xfc\x42\x7d\x7c\xe0\xc2\xf1\xd9\xa9\x95\xa8\x52\x5c\x9a\xd6\xd8\x9d\xe1\x9a\x97\x02\x08\x00\x00\xff\xff\xb7\x22\xe8\x03\xae\x00\x00\x00")
 
-func internal_storage_sql_postgresql_migrations_default_1_init_sql() ([]byte, error) {
-	return bindata_read(
-		_internal_storage_sql_postgresql_migrations_default_1_init_sql,
+func internalStorageSQLPostgresqlMigrationsDefault1InitSQL() ([]byte, error) {
+	return bindataRead(
+		_internalStorageSQLPostgresqlMigrationsDefault1InitSQL,
 		"internal/storage/sql/postgresql/migrations/default/1_init.sql",
+	)
+}
+
+var _internalStorageSQLPostgresqlMigrationsDefault2SQL = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd5\x55\xd0\xce\xcd\x4c\x2f\x4a\x2c\x49\x55\x08\x2d\xe0\x42\xe6\x06\x97\x24\x96\xa4\xe6\xa6\xe6\x95\x38\xa5\xa6\x67\xe6\x71\x39\x07\xb9\x3a\x86\xb8\x2a\x84\xfa\x79\x06\x86\xba\x2a\x78\xfa\xb9\xb8\x46\x28\x94\x16\xe5\xc4\x67\xa6\x54\x28\xf8\xfb\x29\x14\x67\xe4\x17\x95\xa4\xe6\xa5\x16\x95\x16\xe5\x14\x2b\x68\x94\x16\xe5\x68\x5a\x63\x37\xce\x35\x2f\x05\x10\x00\x00\xff\xff\x49\x5d\x57\x61\x76\x00\x00\x00")
+
+func internalStorageSQLPostgresqlMigrationsDefault2SQL() ([]byte, error) {
+	return bindataRead(
+		_internalStorageSQLPostgresqlMigrationsDefault2SQL,
+		"internal/storage/sql/postgresql/migrations/default/2.sql",
 	)
 }
 
@@ -66,8 +74,9 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() ([]byte, error){
-	"bindata.go": bindata_go,
-	"internal/storage/sql/postgresql/migrations/default/1_init.sql": internal_storage_sql_postgresql_migrations_default_1_init_sql,
+	"bindata.go": bindataGo,
+	"internal/storage/sql/postgresql/migrations/default/1_init.sql": internalStorageSQLPostgresqlMigrationsDefault1InitSQL,
+	"internal/storage/sql/postgresql/migrations/default/2.sql":      internalStorageSQLPostgresqlMigrationsDefault2SQL,
 }
 
 // AssetDir returns the file names below a certain
@@ -107,20 +116,21 @@ func AssetDir(name string) ([]string, error) {
 	return rv, nil
 }
 
-type _bintree_t struct {
+type _bintreeT struct {
 	Func     func() ([]byte, error)
-	Children map[string]*_bintree_t
+	Children map[string]*_bintreeT
 }
 
-var _bintree = &_bintree_t{nil, map[string]*_bintree_t{
-	"bindata.go": &_bintree_t{bindata_go, map[string]*_bintree_t{}},
-	"internal": &_bintree_t{nil, map[string]*_bintree_t{
-		"storage": &_bintree_t{nil, map[string]*_bintree_t{
-			"sql": &_bintree_t{nil, map[string]*_bintree_t{
-				"postgresql": &_bintree_t{nil, map[string]*_bintree_t{
-					"migrations": &_bintree_t{nil, map[string]*_bintree_t{
-						"default": &_bintree_t{nil, map[string]*_bintree_t{
-							"1_init.sql": &_bintree_t{internal_storage_sql_postgresql_migrations_default_1_init_sql, map[string]*_bintree_t{}},
+var _bintree = &_bintreeT{nil, map[string]*_bintreeT{
+	"bindata.go": &_bintreeT{bindataGo, map[string]*_bintreeT{}},
+	"internal": &_bintreeT{nil, map[string]*_bintreeT{
+		"storage": &_bintreeT{nil, map[string]*_bintreeT{
+			"sql": &_bintreeT{nil, map[string]*_bintreeT{
+				"postgresql": &_bintreeT{nil, map[string]*_bintreeT{
+					"migrations": &_bintreeT{nil, map[string]*_bintreeT{
+						"default": &_bintreeT{nil, map[string]*_bintreeT{
+							"1_init.sql": &_bintreeT{internalStorageSQLPostgresqlMigrationsDefault1InitSQL, map[string]*_bintreeT{}},
+							"2.sql":      &_bintreeT{internalStorageSQLPostgresqlMigrationsDefault2SQL, map[string]*_bintreeT{}},
 						}},
 					}},
 				}},

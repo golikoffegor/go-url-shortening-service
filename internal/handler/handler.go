@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"reflect"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -27,7 +28,13 @@ func JSONHandlerURL(w http.ResponseWriter, r *http.Request) {
 		shortening := model.Shortening{Key: genShortURL(), URL: inputJSON.URL}
 		// Сохраняем данные в хранилище
 		err := Storage.Put(shortening)
-		if err != nil {
+		if reflect.DeepEqual(err, model.ConflictError{}) {
+			duplShortening, _ := Storage.GetByURL(shortening.URL)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(409)
+			resultModel := model.ResultShortenURL{URL: config.BaseURL + "/" + duplShortening.Key}
+			resultJSON, _ := json.Marshal(resultModel)
+			_, _ = w.Write(resultJSON)
 			return
 		}
 		// Установка заголовков
@@ -101,7 +108,11 @@ func RegistryHandlerURL(w http.ResponseWriter, r *http.Request) {
 		shortening := model.Shortening{Key: genShortURL(), URL: string(body)}
 		// Сохраняем данные в хранилище
 		err := Storage.Put(shortening)
-		if err != nil {
+		if reflect.DeepEqual(err, model.ConflictError{}) {
+			duplShortening, _ := Storage.GetByURL(shortening.URL)
+			w.Header().Set("Content-Type", "text/plain")
+			w.WriteHeader(409)
+			_, _ = w.Write([]byte(config.BaseURL + "/" + duplShortening.Key))
 			return
 		}
 		// Установка заголовков

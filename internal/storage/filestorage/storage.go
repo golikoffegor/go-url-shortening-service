@@ -94,3 +94,8 @@ func (fs *FileStorage) PutBatch(shorteningList []model.Shortening) error {
 func (fs *FileStorage) Initialize() error {
 	return nil
 }
+
+// TODO
+func (fs *FileStorage) GetByURL(url string) (*model.Shortening, error) {
+	return nil, nil
+}

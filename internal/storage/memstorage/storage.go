@@ -46,3 +46,8 @@ func (m MemStorage) PutBatch(shorteningList []model.Shortening) error {
 func (m MemStorage) Initialize() error {
 	return nil
 }
+
+// TODO
+func (m MemStorage) GetByURL(url string) (*model.Shortening, error) {
+	return nil, nil
+}

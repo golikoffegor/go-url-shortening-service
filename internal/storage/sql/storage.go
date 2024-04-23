@@ -4,6 +4,7 @@ import (
 	_ "database/sql"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	migrate "github.com/rubenv/sql-migrate"
@@ -32,10 +33,22 @@ func (ps *PostgreSQLStorage) Get(key string) (*model.Shortening, error) {
 	return &shortening, err
 }
 
+// Get возвращает URL из хранилища по ключу key
+func (ps *PostgreSQLStorage) GetByURL(url string) (*model.Shortening, error) {
+	shortening := model.Shortening{}
+	query := fmt.Sprintf("SELECT url, url_key FROM shortenerurls WHERE url = '%v';", url)
+	rows := ps.db.RwDB.DB.QueryRow(query)
+	err := rows.Scan(&shortening.URL, &shortening.Key)
+	return &shortening, err
+}
+
 // Put записывает URL в хранилище с ключом key
 func (ps *PostgreSQLStorage) Put(shortening model.Shortening) error {
 	query := fmt.Sprintf("INSERT INTO shortenerurls (url, url_key) VALUES ('%v', '%v');", shortening.URL, shortening.Key)
 	_, err := ps.db.RwDB.DB.Exec(query)
+	if driverErr, ok := err.(*pgconn.PgError); ok && driverErr.Code == "23505" {
+		return model.ConflictError{}
+	}
 	return err
 }
 
