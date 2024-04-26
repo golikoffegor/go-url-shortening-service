@@ -16,8 +16,10 @@ import (
 func run() error {
 	r := chi.NewRouter()
 	r.Post("/api/shorten", middleware.GZIP(middleware.Log(handler.JSONHandlerURL)))
+	r.Post("/api/shorten/batch", middleware.GZIP(middleware.Log(handler.BatchRegistryHandlerURL)))
 	r.Post("/", middleware.GZIP(middleware.Log(handler.RegistryHandlerURL)))
 	r.Get("/{id}", middleware.GZIP(middleware.Log(handler.GetURLbyIDHandler)))
+	r.Get("/ping", middleware.GZIP(middleware.Log(handler.GetPingDB)))
 	fmt.Println("Running server on", config.ServerAdress)
 	return http.ListenAndServe(config.ServerAdress, r)
 }
@@ -25,6 +27,10 @@ func run() error {
 // Инициализация и запуск сервера
 func InitAndRunServer() {
 	handler.Storage = storage.GetStorage()
+	err := handler.Storage.Initialize()
+	if err != nil {
+		panic(err)
+	}
 	if err := run(); err != nil {
 		panic(err)
 	}

@@ -12,7 +12,7 @@ type MemStorage struct {
 	urlAddresses map[string]string
 }
 
-// NewMemStorage создает новый экземпляр MemStorage
+// NewStorage создает новый экземпляр MemStorage
 func NewStorage() interfaces.Storager {
 	return &MemStorage{
 		urlAddresses: make(map[string]string),
@@ -33,4 +33,21 @@ func (m MemStorage) Get(key string) (*model.Shortening, error) {
 func (m MemStorage) Put(shortening model.Shortening) error {
 	m.urlAddresses[shortening.Key] = shortening.URL
 	return nil
+}
+
+func (m MemStorage) PutBatch(shorteningList []model.Shortening) error {
+	for _, item := range shorteningList {
+		m.urlAddresses[item.Key] = item.URL
+	}
+	return nil
+}
+
+// Initialize хранилища
+func (m MemStorage) Initialize() error {
+	return nil
+}
+
+// TODO
+func (m MemStorage) GetByURL(url string) (*model.Shortening, error) {
+	return nil, nil
 }

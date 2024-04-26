@@ -9,6 +9,7 @@ var (
 	ServerAdress    string
 	BaseURL         string
 	FileStoragePath string
+	PostgreSQLDSN   string
 )
 
 func ParseFlags() {
@@ -16,6 +17,7 @@ func ParseFlags() {
 	flag.StringVar(&BaseURL, "b", "http://localhost:8080", "Base URL for requests")
 	flag.StringVar(&FileStoragePath, "f", "/tmp/short-url-db.json",
 		"full name of the file where data in JSON format is saved")
+	flag.StringVar(&PostgreSQLDSN, "d", "", "Base DSN for PostgreSQL")
 	flag.Parse()
 	if envRunAddr := os.Getenv("SERVER_ADDRESS"); envRunAddr != "" {
 		ServerAdress = envRunAddr
@@ -25,5 +27,8 @@ func ParseFlags() {
 	}
 	if envFileStoragePath := os.Getenv("FILE_STORAGE_PATH"); envFileStoragePath != "" {
 		FileStoragePath = envFileStoragePath
+	}
+	if envPostgreSQLDSN := os.Getenv("DATABASE_DSN"); envPostgreSQLDSN != "" {
+		PostgreSQLDSN = envPostgreSQLDSN
 	}
 }
