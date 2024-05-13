@@ -15,11 +15,12 @@ import (
 // Инициализации зависимостей сервера перед запуском
 func run() error {
 	r := chi.NewRouter()
-	r.Post("/api/shorten", middleware.GZIP(middleware.Log(handler.JSONHandlerURL)))
-	r.Post("/api/shorten/batch", middleware.GZIP(middleware.Log(handler.BatchRegistryHandlerURL)))
-	r.Post("/", middleware.GZIP(middleware.Log(handler.RegistryHandlerURL)))
-	r.Get("/{id}", middleware.GZIP(middleware.Log(handler.GetURLbyIDHandler)))
-	r.Get("/ping", middleware.GZIP(middleware.Log(handler.GetPingDB)))
+	r.Post("/api/shorten", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.JSONHandlerURL))))
+	r.Post("/api/shorten/batch", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.BatchRegistryHandlerURL))))
+	r.Post("/", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.RegistryHandlerURL))))
+	r.Get("/{id}", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.GetURLbyIDHandler))))
+	r.Get("/ping", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.GetPingDB))))
+	r.Get("/api/user/urls", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.GetByUserID))))
 	fmt.Println("Running server on", config.ServerAdress)
 	return http.ListenAndServe(config.ServerAdress, r)
 }

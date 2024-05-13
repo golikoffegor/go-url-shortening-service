@@ -99,3 +99,8 @@ func (fs *FileStorage) Initialize() error {
 func (fs *FileStorage) GetByURL(url string) (*model.Shortening, error) {
 	return nil, nil
 }
+
+// TODO
+func (fs *FileStorage) GetByUserID(id string) ([]*model.Shortening, error) {
+	return nil, nil
+}

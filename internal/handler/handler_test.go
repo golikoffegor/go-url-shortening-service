@@ -18,11 +18,13 @@ func TestJSONHandlerURL(t *testing.T) {
 		method      string
 		body        string
 		contentType string
+		userID      string
 	}
 	type want struct {
 		code        int
 		contentType string
 		contentBody string
+		userID      string
 	}
 	tests := []struct {
 		name    string
@@ -35,11 +37,13 @@ func TestJSONHandlerURL(t *testing.T) {
 				method:      http.MethodPost,
 				body:        `{"URL":"http://practicum.yandex.ru/"}`,
 				contentType: "application/json",
+				userID:      "0123456789",
 			},
 			want: want{
 				code:        http.StatusCreated,
 				contentType: "application/json",
 				contentBody: `{"result":"`,
+				userID:      "0123456789",
 			},
 		},
 		{
@@ -48,11 +52,13 @@ func TestJSONHandlerURL(t *testing.T) {
 				method:      http.MethodPost,
 				body:        "",
 				contentType: "application/json",
+				userID:      "0123456789",
 			},
 			want: want{
 				code:        http.StatusBadRequest,
 				contentType: "text/plain",
 				contentBody: "No URL in request",
+				userID:      "0123456789",
 			},
 		},
 	}
@@ -65,6 +71,7 @@ func TestJSONHandlerURL(t *testing.T) {
 			req := httptest.NewRequest(test.request.method, "/api/shorten", strings.NewReader(test.request.body))
 			// Задаем заголовки
 			req.Header.Set("Content-Type", test.request.contentType)
+			req.Header.Set("User-Id", test.request.userID)
 			// Создаем ResponseRecorder для записи ответа сервера
 			w := httptest.NewRecorder()
 			// Создаем обработчик и вызываем его метод ServeHTTP
@@ -87,11 +94,13 @@ func TestRegistryHandlerURL(t *testing.T) {
 		method      string
 		body        string
 		contentType string
+		userID      string
 	}
 	type want struct {
 		code        int
 		contentType string
 		contentBody string
+		userID      string
 	}
 	tests := []struct {
 		name    string
@@ -104,11 +113,13 @@ func TestRegistryHandlerURL(t *testing.T) {
 				method:      http.MethodPost,
 				body:        "https://practicum.yandex.ru/",
 				contentType: "text/plain",
+				userID:      "0123456789",
 			},
 			want: want{
 				code:        http.StatusCreated,
 				contentType: "text/plain",
 				contentBody: "http://localhost:8080/",
+				userID:      "0123456789",
 			},
 		},
 		{
@@ -117,11 +128,13 @@ func TestRegistryHandlerURL(t *testing.T) {
 				method:      http.MethodPost,
 				body:        "",
 				contentType: "text/plain",
+				userID:      "0123456789",
 			},
 			want: want{
 				code:        http.StatusBadRequest,
 				contentType: "text/plain",
 				contentBody: "No URL in request",
+				userID:      "0123456789",
 			},
 		},
 	}
@@ -133,6 +146,7 @@ func TestRegistryHandlerURL(t *testing.T) {
 			req := httptest.NewRequest(test.request.method, "/", strings.NewReader(test.request.body))
 			// Задаем заголовки
 			req.Header.Set("Content-Type", test.request.contentType)
+			req.Header.Set("User-Id", test.request.userID)
 			// Создаем ResponseRecorder для записи ответа сервера
 			w := httptest.NewRecorder()
 			// Создаем обработчик и вызываем его метод ServeHTTP
@@ -156,11 +170,13 @@ func TestGetURLbyIDHandler(t *testing.T) {
 		method      string
 		urlAddr     string
 		contentType string
+		userID      string
 	}
 	type want struct {
 		code        int
 		contentType string
 		location    string
+		userID      string
 	}
 	tests := []struct {
 		name    string
@@ -173,11 +189,13 @@ func TestGetURLbyIDHandler(t *testing.T) {
 				method:      http.MethodGet,
 				urlAddr:     "http://localhost:8080/",
 				contentType: "text/plain",
+				userID:      "0123456789",
 			},
 			want: want{
 				code:        http.StatusTemporaryRedirect,
 				contentType: "text/plain",
 				location:    "https://practicum.yandex.ru/",
+				userID:      "0123456789",
 			},
 		},
 		{
@@ -186,11 +204,13 @@ func TestGetURLbyIDHandler(t *testing.T) {
 				method:      http.MethodGet,
 				urlAddr:     "http://localhost:8080/",
 				contentType: "text/plain",
+				userID:      "0123456789",
 			},
 			want: want{
 				code:        http.StatusBadRequest,
 				contentType: "text/plain",
 				location:    "",
+				userID:      "0123456789",
 			},
 		},
 	}
@@ -204,6 +224,7 @@ func TestGetURLbyIDHandler(t *testing.T) {
 			req := httptest.NewRequest(test.request.method, "/"+shortening.Key, strings.NewReader(""))
 			// Задаем заголовки
 			req.Header.Set("Content-Type", test.request.contentType)
+			req.Header.Set("User-Id", test.request.userID)
 			// Создаем ResponseRecorder для записи ответа сервера
 			w := httptest.NewRecorder()
 			// Создаем обработчик и вызываем его метод ServeHTTP
