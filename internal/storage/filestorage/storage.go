@@ -104,3 +104,8 @@ func (fs *FileStorage) GetByURL(url string) (*model.Shortening, error) {
 func (fs *FileStorage) GetByUserID(id string) ([]*model.Shortening, error) {
 	return nil, nil
 }
+
+// TODO
+func (fs *FileStorage) DeleteByUserIDBatch(doneCh chan struct{}, userID string, urlKeys []string) chan error {
+	return nil
+}

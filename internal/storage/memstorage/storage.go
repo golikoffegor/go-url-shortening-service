@@ -56,3 +56,8 @@ func (m MemStorage) GetByURL(url string) (*model.Shortening, error) {
 func (m MemStorage) GetByUserID(id string) ([]*model.Shortening, error) {
 	return nil, nil
 }
+
+// TODO
+func (m MemStorage) DeleteByUserIDBatch(doneCh chan struct{}, userID string, urlKeys []string) chan error {
+	return nil
+}

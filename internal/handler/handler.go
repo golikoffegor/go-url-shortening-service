@@ -159,7 +159,11 @@ func GetURLbyIDHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.String()[1:]
 	shortening, err := Storage.Get(key)
 	okURL := validateURL(shortening.URL)
-	if err == nil && okURL {
+	if shortening.IsDeleted {
+		// Установка заголовков
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(410)
+	} else if err == nil && okURL {
 		// Установка заголовков
 		w.Header().Set("Content-Type", "text/plain")
 		w.Header().Set("Location", shortening.URL)
@@ -210,6 +214,34 @@ func GetByUserID(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	resultJSON, _ := json.Marshal(outputData)
 	_, _ = w.Write(resultJSON)
+}
+
+func DeleteByUserID(w http.ResponseWriter, r *http.Request) {
+	var inputJSON []string
+	userUUID, ok := r.Header["User-Id"]
+	if !ok || len(userUUID) == 0 {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	body, err := io.ReadAll(r.Body)
+	_ = json.Unmarshal(body, &inputJSON)
+	if err != nil {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(400)
+	}
+	doneCh := make(chan struct{})
+	go func() {
+		for err := range Storage.DeleteByUserIDBatch(doneCh, userUUID[0], inputJSON) {
+			if err != nil {
+				w.Header().Set("Content-Type", "text/plain")
+				w.WriteHeader(400)
+			}
+		}
+
+		defer close(doneCh)
+	}()
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(202)
 }
 
 // Генерирование короткого URL

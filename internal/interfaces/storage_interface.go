@@ -8,5 +8,6 @@ type Storager interface {
 	GetByUserID(id string) ([]*model.Shortening, error)
 	Get(identifier string) (*model.Shortening, error)
 	PutBatch(shorteningList []model.Shortening) error
+	DeleteByUserIDBatch(doneCh chan struct{}, userID string, urlKeys []string) chan error
 	Initialize() error
 }

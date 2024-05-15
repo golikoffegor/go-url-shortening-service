@@ -21,6 +21,7 @@ func run() error {
 	r.Get("/{id}", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.GetURLbyIDHandler))))
 	r.Get("/ping", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.GetPingDB))))
 	r.Get("/api/user/urls", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.GetByUserID))))
+	r.Delete("/api/user/urls", middleware.WithAuth(middleware.GZIP(middleware.Log(handler.DeleteByUserID))))
 	fmt.Println("Running server on", config.ServerAdress)
 	return http.ListenAndServe(config.ServerAdress, r)
 }
