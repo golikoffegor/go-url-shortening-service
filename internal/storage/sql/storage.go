@@ -12,6 +12,7 @@ import (
 	"github.com/golikoffegor/go-url-shortening-service/internal/interfaces"
 	"github.com/golikoffegor/go-url-shortening-service/internal/model"
 	"github.com/golikoffegor/go-url-shortening-service/internal/storage/sql/postgresql"
+	"github.com/golikoffegor/go-url-shortening-service/internal/utils"
 )
 
 // PostgreSQLStorage хранилище
@@ -27,9 +28,9 @@ func NewStorage() interfaces.Storager {
 // Get возвращает URL из хранилища по ключу key
 func (ps *PostgreSQLStorage) Get(key string) (*model.Shortening, error) {
 	shortening := model.Shortening{}
-	query := fmt.Sprintf("SELECT url, url_key FROM shortenerurls WHERE url_key = '%v';", key)
+	query := fmt.Sprintf("SELECT url, url_key, is_deleted FROM shortenerurls WHERE url_key = '%v';", key)
 	rows := ps.db.RwDB.DB.QueryRow(query)
-	err := rows.Scan(&shortening.URL, &shortening.Key)
+	err := rows.Scan(&shortening.URL, &shortening.Key, &shortening.IsDeleted)
 	return &shortening, err
 }
 
@@ -42,9 +43,53 @@ func (ps *PostgreSQLStorage) GetByURL(url string) (*model.Shortening, error) {
 	return &shortening, err
 }
 
+// Get возвращает сохраненные URL пользователя из хранилища
+func (ps *PostgreSQLStorage) GetByUserID(id string) ([]*model.Shortening, error) {
+	shorteningList := []*model.Shortening{}
+	query := fmt.Sprintf("SELECT url, url_key, user_id FROM shortenerurls WHERE user_id = '%v';", id)
+	rows, err := ps.db.RwDB.DB.Query(query)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	for rows.Next() {
+		shortening := model.Shortening{}
+		_ = rows.Scan(&shortening.URL, &shortening.Key, &shortening.UserID)
+		shorteningList = append(shorteningList, &shortening)
+	}
+	return shorteningList, err
+}
+
+// Delete удаляет сохраненные URL пользователя из хранилища по ключу
+func (ps *PostgreSQLStorage) DeleteByUserIDBatch(doneCh chan struct{}, userID string, urlKeys []string) chan error {
+	inputCh := utils.Generator(doneCh, urlKeys)
+
+	return utils.FanIn(doneCh, utils.FanOut(10, func() chan error {
+		result := make(chan error)
+
+		go func() {
+			defer close(result)
+
+			for URL := range inputCh {
+				query := fmt.Sprintf("UPDATE shortenerurls SET is_deleted = TRUE WHERE url_key = '%v' AND user_id = '%v';", URL, userID)
+				_, err := ps.db.RwDB.DB.Exec(query)
+				if err != nil {
+					return
+				}
+				select {
+				case <-doneCh:
+					return
+				case result <- err:
+				}
+			}
+		}()
+
+		return result
+	}))
+}
+
 // Put записывает URL в хранилище с ключом key
 func (ps *PostgreSQLStorage) Put(shortening model.Shortening) error {
-	query := fmt.Sprintf("INSERT INTO shortenerurls (url, url_key) VALUES ('%v', '%v');", shortening.URL, shortening.Key)
+	query := fmt.Sprintf("INSERT INTO shortenerurls (url, url_key, user_id) VALUES ('%v', '%v', '%v');", shortening.URL, shortening.Key, shortening.UserID)
 	_, err := ps.db.RwDB.DB.Exec(query)
 	if driverErr, ok := err.(*pgconn.PgError); ok && driverErr.Code == "23505" {
 		return model.ConflictError{}
@@ -55,12 +100,12 @@ func (ps *PostgreSQLStorage) Put(shortening model.Shortening) error {
 func (ps *PostgreSQLStorage) PutBatch(shorteningList []model.Shortening) error {
 	var values string
 	for index, item := range shorteningList {
-		values += fmt.Sprintf("('%v', '%v')", item.URL, item.Key)
+		values += fmt.Sprintf("('%v', '%v', '%v')", item.URL, item.Key, item.UserID)
 		if index < len(shorteningList)-1 {
 			values += ", "
 		}
 	}
-	query := fmt.Sprintf("INSERT INTO shortenerurls (url, url_key) VALUES %s;", values)
+	query := fmt.Sprintf("INSERT INTO shortenerurls (url, url_key, user_id) VALUES %s;", values)
 	_, err := ps.db.RwDB.DB.Exec(query)
 	return err
 }

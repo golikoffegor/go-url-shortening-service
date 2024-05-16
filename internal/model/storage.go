@@ -1,6 +1,8 @@
 package model
 
 type Shortening struct {
-	Key string
-	URL string
+	Key       string
+	URL       string
+	UserID    string
+	IsDeleted bool
 }
